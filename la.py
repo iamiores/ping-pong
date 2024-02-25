@@ -125,15 +125,24 @@ while game:
                 # ball.speed_y = -ball.speed_y
                 ball.speed_x = -ball.speed_x
 
-            text_lose = font.render(str(platform_1_score) + ' - ' + str(platform_2_score), True, (0, 0, 0))
-            window.blit(text_lose, (300, 20))
+            platform1_lose = font.render('Player 2 win!', True, (0, 0, 0))
+            platform2_lose = font.render('Player 1 win!', True, (0, 0, 0))
+            if platform_1_score >= 6:
+                finish = True
+                window.blit(platform2_lose, (200, 300))
+            elif platform_2_score >= 6:
+                finish = True
+                window.blit(platform1_lose, (200, 300))
+
+            scores = font.render(str(platform_1_score) + ' - ' + str(platform_2_score), True, (0, 0, 0))
+            window.blit(scores, (300, 20))
 
             if ball.rect.x <= 0:
-                platform_1_score += 1
+                platform_2_score += 1
                 ball = Ball('ball.png', x, y, 50, 50, randint(4, 6), randint(4, 6))
                 ball.movement()
             elif ball.rect.x >= win_width:
-                platform_2_score += 1
+                platform_1_score += 1
                 ball = Ball('ball.png', x, y, 50, 50, randint(4, 6), randint(4, 6))
                 ball.movement()
 
