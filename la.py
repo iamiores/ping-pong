@@ -11,6 +11,9 @@ win_height = 600
 window = pygame.display.set_mode((win_width, win_height))
 window.fill(background_color)
 
+platform_1_score = 0
+platform_2_score = 0
+
 
 class GameSprite(sprite.Sprite):
     def __init__(self, sprite_image, sprite_x, sprite_y, sprite_width, sprite_height, sprite_speed):
@@ -25,18 +28,24 @@ class GameSprite(sprite.Sprite):
         window.blit(self.image, (self.rect.x, self.rect.y))
 
 
-class Platform(GameSprite):
+class Platform:
+    def __init__(self, sprite_color, sprite_x, sprite_y, sprite_width, sprite_height, sprite_speed):
+        self.color = sprite_color
+        self.rect = pygame.Rect(sprite_x, sprite_y, sprite_width, sprite_height)
+        self.speed = sprite_speed
+
+    def reset(self):
+        pygame.draw.rect(window, self.color, self.rect)
+
     def update_1(self):
-        # pygame.draw.rect(window, (255, 255, 255), self.rect, 2)
-        keys = key.get_pressed()
+        keys = pygame.key.get_pressed()
         if keys[K_w] and self.rect.top >= 0:
             self.rect.y -= self.speed
         if keys[K_s] and self.rect.bottom <= win_height:
             self.rect.y += self.speed
 
     def update_2(self):
-        # pygame.draw.rect(window, (255, 255, 255), self.rect, 2)
-        keys = key.get_pressed()
+        keys = pygame.key.get_pressed()
         if keys[K_UP] and self.rect.top >= 0:
             self.rect.y -= self.speed
         if keys[K_DOWN] and self.rect.bottom <= win_height:
@@ -85,8 +94,8 @@ x = win_width // 2
 y = win_height // 2
 
 ball = Ball('ball.png', x, y, 50, 50, randint(4, 6), randint(4, 6))
-platform_2 = Platform('platform.png', win_width - 95, win_height // 2, 50, 190, 4)
-platform_1 = Platform('platform.png', 50, win_height // 2, 50, 190, 4)
+platform_2 = Platform((0, 0, 0), win_width - 95, win_height // 2, 30, 160, 4)
+platform_1 = Platform((0, 0, 0), 50, win_height // 2, 30, 160, 4)
 
 font = pygame.font.Font(None, 70)
 
@@ -116,13 +125,17 @@ while game:
                 # ball.speed_y = -ball.speed_y
                 ball.speed_x = -ball.speed_x
 
-            text_lose = font.render('YOU LOSE!', True, (0, 0, 0))
+            text_lose = font.render(str(platform_1_score) + ' - ' + str(platform_2_score), True, (0, 0, 0))
+            window.blit(text_lose, (300, 20))
 
-            if ball.rect.x <= 0 or ball.rect.x >= win_width:
-                finish = True
-                state = 'finish'
-        if state == 'finish':
-            window.blit(text_lose, (win_width - 500, win_height - 350))
+            if ball.rect.x <= 0:
+                platform_1_score += 1
+                ball = Ball('ball.png', x, y, 50, 50, randint(4, 6), randint(4, 6))
+                ball.movement()
+            elif ball.rect.x >= win_width:
+                platform_2_score += 1
+                ball = Ball('ball.png', x, y, 50, 50, randint(4, 6), randint(4, 6))
+                ball.movement()
 
     pygame.display.update()
     clock.tick(fps)
